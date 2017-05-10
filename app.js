@@ -1,44 +1,85 @@
 const AUDIO_CONTEXT = new AudioContext();
 const ANALYSER = AUDIO_CONTEXT.createAnalyser();
-var canvasCtx;
 
 //	**************	Settings stuff	**************
+//	Selected visualization style. This will determine which visualization function to run/stop
+var selected = '';
+
 //	"Frequency Bars" settings variables
 var freq_bars_sliders;
 var freq_bars_values;
 
-//	Get the canvas context and initialize the audio analyser
+//	Entry point for the whole app.
 window.onload = function init() {
-	canvasCtx = document.getElementById('c').getContext('2d');
 
 	//	Use sound card's "Stereo Mix" as the audio source, then connect it to ANALYSER
 	//	so we can extract frequency data from it to visualize
 	navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(function(stream){
 		var source = AUDIO_CONTEXT.createMediaStreamSource(stream);
 		source.connect(ANALYSER);
-		visualizeFrequencyBars();
 	}).catch(function(err){
 		console.log(err.name + ": " + err.message)
 	});
 
-
+	//	Initializes the Sliding Menu by adding an event listener to the button
 	initMenu();
-	initFreqBarsStyle();
 
-	//	**************	Visualization style selection	**************
+	//	Initializes the Frequency Bars settings with event listeners and sliders
+	initFreqBarsStyleSettings();
 
+	//	Initializes the Style Chooser with event listeners
+	initVizStyleChooser();
 
 }
 
+//	**************	Visualization style selection	**************
+function initVizStyleChooser(){
+
+	const STYLES = document.getElementsByClassName('viz-style');
+
+	for(let i=0; i<STYLES.length; i++){
+
+		STYLES[i].addEventListener('click', function(){
+
+			//	Clear any existing canvas
+			var toClear = document.getElementsByTagName('canvas');
+			for(let i=0; i<toClear.length; i++){
+				toClear[i].remove();
+			}
+
+			//	Deselect all the other Styles
+			for(let j=0; j<STYLES.length; j++){
+				STYLES[j].className = 'viz-style generic-menu-item';
+			}
+
+			STYLES[i].className = 'viz-style generic-menu-item selected';
+			selected = STYLES[i].innerHTML;
+
+			switch(i){
+				//	Krazy Lines
+				case 0:
+					break;
+
+				//	Frequency Bars
+				case 1:
+					visualizeFrequencyBars();
+			}
+		});
+	}
+
+	//	"Frequency Bars" is the default style when the app starts
+	STYLES[1].click();
+}
+
 //	**************	"Frequency Bars" Style Settings 	**************
-function initFreqBarsStyle(){
+function initFreqBarsStyleSettings(){
 	//	All the "Frequency Bars" settings sliders
 	freq_bars_sliders = document.getElementsByClassName('freq-bars-slider');
 	freq_bars_values = document.getElementsByClassName('freq-bars-slider-value');
 
 	//	Callback function in response to a slider's update' events. 
 	//	This function updates the display value on the page to reflect the value of the slider 
-	function setFreqBarsColors(){
+	function updateSliderDisplayValue(){
 		for(let i=0; i<freq_bars_sliders.length; i++){
 			if(typeof freq_bars_sliders[i].noUiSlider != 'undefined'){
 				if(i === 3 || i === 7 || i === 11){
@@ -94,6 +135,7 @@ function initFreqBarsStyle(){
 				connect: [true, false]
 			});
 		}
+		//	RGB Sliders
 		else{
 			noUiSlider.create(freq_bars_sliders[i],{
 				start: 120,
@@ -107,52 +149,60 @@ function initFreqBarsStyle(){
 		}
 
 		//	Bind callback function to the 'update' event for this particular slider
-		freq_bars_sliders[i].noUiSlider.on('update', setFreqBarsColors);
+		freq_bars_sliders[i].noUiSlider.on('update', updateSliderDisplayValue);
 	}
 
 
 	//	**************PRESET STYLE SELECTION**************
+
+	//	Store all the preset choices into an array so we can programatically add
+	//	event listeners to each.
 	const BARS_PRESETS = document.getElementsByClassName('bars-presets');
 
-	//	Blue Sky
-	BARS_PRESETS[0].addEventListener('click', function(){
-		freq_bars_sliders[0].noUiSlider.set(100);
-		freq_bars_sliders[1].noUiSlider.set(200);
-		freq_bars_sliders[2].noUiSlider.set(230);
-		freq_bars_sliders[3].noUiSlider.set(1.0);
-		freq_bars_sliders[4].noUiSlider.set(102);
-		freq_bars_sliders[5].noUiSlider.set(102);
-		freq_bars_sliders[6].noUiSlider.set(255);
-		freq_bars_sliders[7].noUiSlider.set(0.5);
-		freq_bars_sliders[8].noUiSlider.set(85);
-		freq_bars_sliders[9].noUiSlider.set(100);
-		freq_bars_sliders[10].noUiSlider.set(250);
-		freq_bars_sliders[11].noUiSlider.set(1.0);
-		for(let i=0; i<BARS_PRESETS.length; i++){
-			BARS_PRESETS[i].className = "bars-presets generic-menu-item";
-		}
-		BARS_PRESETS[0].className = "bars-presets generic-menu-item selected";
-	});
+	for(let i=0; i<BARS_PRESETS.length; i++){
 
-	//	Neon Purple
-	BARS_PRESETS[1].addEventListener('click', function(){
-		freq_bars_sliders[0].noUiSlider.set(255);
-		freq_bars_sliders[1].noUiSlider.set(74);
-		freq_bars_sliders[2].noUiSlider.set(243);
-		freq_bars_sliders[3].noUiSlider.set(1.0);
-		freq_bars_sliders[4].noUiSlider.set(0);
-		freq_bars_sliders[5].noUiSlider.set(17);
-		freq_bars_sliders[6].noUiSlider.set(20);
-		freq_bars_sliders[7].noUiSlider.set(0.63);
-		freq_bars_sliders[8].noUiSlider.set(55);
-		freq_bars_sliders[9].noUiSlider.set(227);
-		freq_bars_sliders[10].noUiSlider.set(101);
-		freq_bars_sliders[11].noUiSlider.set(1.0);
-		for(let i=0; i<BARS_PRESETS.length; i++){
-			BARS_PRESETS[i].className = "bars-presets generic-menu-item";
-		}
-		BARS_PRESETS[1].className = "bars-presets generic-menu-item selected";
-	});
+		BARS_PRESETS[i].addEventListener('click', function(){
+
+			//	Deselect all the presets, then select the one that was clicked
+			for(let j=0; j<BARS_PRESETS.length; j++){
+				BARS_PRESETS[j].className = "bars-presets generic-menu-item";
+			}
+			BARS_PRESETS[i].className = "bars-presets generic-menu-item selected";
+			
+			let presetSliderSettings;
+
+			switch(i){
+
+				//	Blue Sky
+				case 0:
+					presetSliderSettings = [100, 200, 230, 1.0, 102, 102, 255, 0.5, 85, 100, 250, 1.0, 8];
+					for(let k=0; k<freq_bars_sliders.length; k++){
+						let presetValue = presetSliderSettings[k];
+						freq_bars_sliders[k].noUiSlider.set(presetValue);
+					}
+					break;
+
+				//	Neon Purple
+				case 1:
+					presetSliderSettings = [255, 74, 243, 1.0, 0, 17, 20, 0.63, 55, 227, 101, 1.0, 8];
+					for(let k=0; k<freq_bars_sliders.length; k++){
+						let presetValue = presetSliderSettings[k];
+						freq_bars_sliders[k].noUiSlider.set(presetValue);
+					}
+					break;
+
+				//	Twilight
+				case 2:
+					presetSliderSettings = [0, 0, 49, 1.0, 19, 0, 0, 0.85, 9, 255, 255, 0.15, 8];
+					for(let k=0; k<freq_bars_sliders.length; k++){
+						let presetValue = presetSliderSettings[k];
+						freq_bars_sliders[k].noUiSlider.set(presetValue);
+					}
+					break;
+			}
+		});
+	}
+	
 
 	//	Twilight
 	BARS_PRESETS[2].addEventListener('click', function(){
@@ -211,7 +261,25 @@ function resizeCanvas(){
 
 function visualizeFrequencyBars(){
 
+	//	Create a new Canvas element and insert it into the DOM
+	var canvasElement = document.createElement('canvas')
+	canvasElement.setAttribute('id', 'c');
+	document.body.appendChild(canvasElement);
+	canvasCtx = document.getElementById('c').getContext('2d');
+
 	function draw() {
+
+		/*
+		 *	Dynamically resize the canvas every frame to match the browser size.
+		 *	This ensures that it is rendered correctly even if the window size has
+		 *	changed.
+		 */
+		resizeCanvas();
+
+		//	Check if this is still the selected visualization style
+		if(selected === 'Frequency Bars'){
+			requestAnimationFrame(draw);
+		}
 
 		//	Read the value from the appropriate settings slider
 		var bar_count = Math.pow(2, Math.round(freq_bars_sliders[12].noUiSlider.get()));
@@ -232,18 +300,9 @@ function visualizeFrequencyBars(){
 		var bufferLength = ANALYSER.frequencyBinCount;
 		var dataArray = new Uint8Array(bufferLength);
 
-		/*
-		 *	Dynamically resize the canvas every frame to match the browser size.
-		 *	This ensures that it is rendered correctly even if the window size has
-		 *	changed.
-		 */
-		resizeCanvas();
-
-		requestAnimationFrame(draw);
 
 		//	Fills 'dataArray' with frequency data from the audio source.
 		ANALYSER.getByteFrequencyData(dataArray);
-
 
 		//	Get the color values from the slider settings
 		//	Background 1 RGBA colors

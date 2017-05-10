@@ -7,6 +7,9 @@ body, html{
 	overflow-x: hidden;
 }
 
+canvas{
+	position: absolute;
+}
 /*	
 	Slider menu button	
 */
@@ -102,12 +105,6 @@ body, html{
 	margin: 0px 30px;
 	padding: 10px 6px 10px 17px;
 }
-.slider{
-	display: inline-block;
-	width: 240px;
-	float: right;
-	margin-top: 7px;
-}
 .slider-label{
 	display: inline-block;
 	font-family: Arial, sans-serif;
@@ -117,4 +114,10 @@ body, html{
 }
 .slider-value{
 	float: right;
+}
+.slider{
+	display: inline-block;
+	width: 240px;
+	float: right;
+	margin-top: 7px;
 }

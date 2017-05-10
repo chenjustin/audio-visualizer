@@ -6,7 +6,6 @@ body, html{
 	-ms-user-select: none; /* IE10+ */
 	overflow-x: hidden;
 }
-
 canvas{
 	position: absolute;
 }
@@ -101,7 +100,7 @@ canvas{
 }
 
 /*	Visualization Style Settings	*/
-.slider-and-label{
+.settings-item-container{
 	margin: 0px 30px;
 	padding: 10px 6px 10px 17px;
 }
@@ -120,4 +119,20 @@ canvas{
 	width: 240px;
 	float: right;
 	margin-top: 7px;
+}
+
+label{
+	display: inline-block;
+	font-family: Arial, sans-serif;
+	color: #DEDEDE;
+	font-size: 15px;
+	vertical-align: middle;
+}
+input{
+	vertical-align: middle;
+	float: right;
+	width: 40px;
+	height: 40px;
+	border-color: red;
+	border-radius: 50%;
 }

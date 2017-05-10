@@ -1,7 +1,12 @@
 const AUDIO_CONTEXT = new AudioContext();
 const ANALYSER = AUDIO_CONTEXT.createAnalyser();
-var source;
 var canvasCtx;
+
+//	**************	Settings stuff	**************
+//	"Frequency Bars" settings variables
+var freq_bars_sliders;
+var freq_bars_values;
+
 
 //	Get the canvas context and initialize the audio analyser
 window.onload = function init() {
@@ -9,7 +14,7 @@ window.onload = function init() {
 	//	Use sound card's "Stereo Mix" as the audio source, then connect it to ANALYSER
 	//	so we can extract frequency data from it to visualize
 	navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(function(stream){
-		source = AUDIO_CONTEXT.createMediaStreamSource(stream);
+		var source = AUDIO_CONTEXT.createMediaStreamSource(stream);
 		source.connect(ANALYSER);
 		visualize();
 	}).catch(function(err){
@@ -45,89 +50,63 @@ window.onload = function init() {
 	//	**************	Visualization style selection	**************
 
 	//	**************	"Frequency Bars" Style Settings 	**************
-	//	Background RGB
-	const BARS_BGCOLOR1_RED_SLIDER = document.getElementById('bars-bgcolor1-red-slider');
-	const BARS_BGCOLOR1_GREEN_SLIDER = document.getElementById('bars-bgcolor1-green-slider');
-	const BARS_BGCOLOR1_BLUE_SLIDER = document.getElementById('bars-bgcolor1-blue-slider');
-	const BARS_BGCOLOR1_OPACITY_SLIDER = document.getElementById('bars-bgcolor1-opacity-slider');
-	const BARS_BGCOLOR2_RED_SLIDER = document.getElementById('bars-bgcolor2-red-slider');
-	const BARS_BGCOLOR2_GREEN_SLIDER = document.getElementById('bars-bgcolor2-green-slider');
-	const BARS_BGCOLOR2_BLUE_SLIDER = document.getElementById('bars-bgcolor2-blue-slider');
-	const BARS_BGCOLOR2_OPACITY_SLIDER = document.getElementById('bars-bgcolor2-opacity-slider');
 
-	noUiSlider.create(BARS_BGCOLOR1_RED_SLIDER, {
-		start: 80,
-		step: 1,
-		range: {
-			'min': 0,
-			'max': 255
-		},
-		connect: [true, false]
-	});
-	noUiSlider.create(BARS_BGCOLOR1_GREEN_SLIDER, {
-		start: 80,
-		step: 1,
-		range: {
-			'min': 0,
-			'max': 255
-		},
-		connect: [true, false]
-	});
-	noUiSlider.create(BARS_BGCOLOR1_BLUE_SLIDER, {
-		start: 80,
-		step: 1,
-		range: {
-			'min': 0,
-			'max': 255
-		},
-		connect: [true, false]
-	});
-	noUiSlider.create(BARS_BGCOLOR1_OPACITY_SLIDER, {
-		start: 80,
-		step: 1,
-		range: {
-			'min': 0,
-			'max': 255
-		},
-		connect: [true, false]
-	});
-	noUiSlider.create(BARS_BGCOLOR2_RED_SLIDER, {
-		start: 80,
-		step: 1,
-		range: {
-			'min': 0,
-			'max': 255
-		},
-		connect: [true, false]
-	});
-	noUiSlider.create(BARS_BGCOLOR2_GREEN_SLIDER, {
-		start: 80,
-		step: 1,
-		range: {
-			'min': 0,
-			'max': 255
-		},
-		connect: [true, false]
-	});
-	noUiSlider.create(BARS_BGCOLOR2_BLUE_SLIDER, {
-		start: 80,
-		step: 1,
-		range: {
-			'min': 0,
-			'max': 255
-		},
-		connect: [true, false]
-	});
-	noUiSlider.create(BARS_BGCOLOR2_OPACITY_SLIDER, {
-		start: 80,
-		step: 1,
-		range: {
-			'min': 0,
-			'max': 255
-		},
-		connect: [true, false]
-	});
+	//	All the "Frequency Bars" settings sliders
+	freq_bars_sliders = document.getElementsByClassName('freq-bars-slider');
+	freq_bars_values = document.getElementsByClassName('freq-bars-slider-value');
 
+	/*
+		Initializes an array to hold all the sliders for "Frequency Bars".
+
+		freq_bars_sliders[0] = BG1 Red
+		freq_bars_sliders[1] = BG1 Green
+		freq_bars_sliders[2] = BG1 Blue
+		freq_bars_sliders[3] = BG1 Alpha
+		freq_bars_sliders[4] = BG2 Red
+		freq_bars_sliders[5] = BG2 Green
+		freq_bars_sliders[6] = BG2 Blue
+		freq_bars_sliders[7] = BG2 Alpha
+
+		...etc
+	*/
+	for(let i = 0; i < freq_bars_sliders.length; i++){
+
+		//	i=3, i=7, and i=11 are opacity sliders. They have a different scale
+		if(i === 3 || i === 7 || i === 11){
+			noUiSlider.create(freq_bars_sliders[i],{
+				start: 1.0,
+				step: 0.01,
+				range: {
+					'min': 0,
+					'max': 1.0
+				},
+				connect: [true, false]
+			});
+		}
+		else{
+			noUiSlider.create(freq_bars_sliders[i],{
+				start: 80,
+				step: 1,
+				range: {
+					'min': 0,
+					'max': 255
+				},
+				connect: [true, false]
+			});
+		}
+
+		//	Bind callback function to the 'update' event for this particular slider
+		freq_bars_sliders[i].noUiSlider.on('update', setFreqBarsColors);
+	}
+
+}
+
+function setFreqBarsColors(){
+	for(let i=0; i<freq_bars_sliders.length; i++){
+		if(typeof freq_bars_sliders[i].noUiSlider != 'undefined'){
+			freq_bars_values[i].innerHTML = freq_bars_sliders[i].noUiSlider.get();
+		}
+	}
 }
 
 // Resize the Canvas every frame to match the browser size
@@ -177,8 +156,21 @@ function visualize(){
 
 		// Initialize the gradient color for the background
 		const grd = canvasCtx.createLinearGradient(0, 0, 170, canvasCtx.canvas.height);
-		grd.addColorStop(0, 'rgba(100, 200, 230, 1)');
-		grd.addColorStop(1, 'rgba(102, 102, 255, 0.5)');
+
+		//	Get the color values from the slider settings
+		//	Background 1 RGBA colors
+		let background1_r = Math.round(freq_bars_sliders[0].noUiSlider.get());
+		let background1_g = Math.round(freq_bars_sliders[1].noUiSlider.get());
+		let background1_b = Math.round(freq_bars_sliders[2].noUiSlider.get());
+		let background1_a = Math.round(freq_bars_sliders[3].noUiSlider.get());
+		//	Background 2 RGBA colors
+		let background2_r = Math.round(freq_bars_sliders[4].noUiSlider.get());
+		let background2_g = Math.round(freq_bars_sliders[5].noUiSlider.get());
+		let background2_b = Math.round(freq_bars_sliders[6].noUiSlider.get());
+		let background2_a = Math.round(freq_bars_sliders[7].noUiSlider.get());
+
+		grd.addColorStop(0, 'rgba('+ background1_r +', '+ background1_g +', '+ background1_b +', '+ background1_a +')');
+		grd.addColorStop(1, 'rgba('+ background2_r +', '+ background2_g +', '+ background2_b +', '+ background2_a +')');
 
 		/*
 			Preset 1:

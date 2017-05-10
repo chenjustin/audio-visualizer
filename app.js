@@ -7,9 +7,9 @@ var canvasCtx;
 var freq_bars_sliders;
 var freq_bars_values;
 
-
 //	Get the canvas context and initialize the audio analyser
 window.onload = function init() {
+	canvasCtx = document.getElementById('c').getContext('2d');
 
 	//	Use sound card's "Stereo Mix" as the audio source, then connect it to ANALYSER
 	//	so we can extract frequency data from it to visualize
@@ -22,41 +22,41 @@ window.onload = function init() {
 	});
 
 
-	//	**************	DOM Elements	**************
-	const SETTINGS_BUTTON = document.getElementById('settings-button');
-	const SIDE_MENU = document.getElementById('side-menu');
-	canvasCtx = document.getElementById('c').getContext('2d');
-
-	//	**************	Menu stuff	**************
-	//	All of the menu logic / click event listeners are here
-
-	//	Toggle menu open/close
-	var open = false
-	SETTINGS_BUTTON.addEventListener('click', function(){
-		if(open == false){
-			open = true;
-			SETTINGS_BUTTON.style.transform = 'translate(506px, 0px)';
-			SETTINGS_BUTTON.className = 'fa fa-arrow-left fa-2x';
-			SIDE_MENU.style.transform = 'translateX(0px)';
-		}
-		else{
-			open = false;
-			SETTINGS_BUTTON.style.transform = 'translate(0px, 0px)';
-			SETTINGS_BUTTON.className = 'fa fa-arrow-right fa-2x';
-			SIDE_MENU.style.transform = 'translateX(-510px)';
-		}
-	});
+	initMenu();
+	initFreqBarsStyle();
 
 	//	**************	Visualization style selection	**************
 
-	//	**************	"Frequency Bars" Style Settings 	**************
 
+}
+
+//	**************	"Frequency Bars" Style Settings 	**************
+function initFreqBarsStyle(){
 	//	All the "Frequency Bars" settings sliders
 	freq_bars_sliders = document.getElementsByClassName('freq-bars-slider');
 	freq_bars_values = document.getElementsByClassName('freq-bars-slider-value');
 
+	//	Callback function in response to a slider's update' events. 
+	//	This function updates the display value on the page to reflect the value of the slider 
+	function setFreqBarsColors(){
+		for(let i=0; i<freq_bars_sliders.length; i++){
+			if(typeof freq_bars_sliders[i].noUiSlider != 'undefined'){
+				if(i === 3 || i === 7 || i === 11){
+					freq_bars_values[i].innerHTML = freq_bars_sliders[i].noUiSlider.get();
+				}
+				else if(i === 12){
+					freq_bars_values[i].innerHTML = Math.pow(2, Math.round(freq_bars_sliders[i].noUiSlider.get()))/2;
+				}
+				else{
+					freq_bars_values[i].innerHTML = Math.round(freq_bars_sliders[i].noUiSlider.get());
+				}
+			}
+		}
+	}
+
 	/*
 		Initializes an array to hold all the sliders for "Frequency Bars".
+		Uses noUiSlider's constructor to create mulitple sliders.
 
 		freq_bars_sliders[0] = BG1 Red
 		freq_bars_sliders[1] = BG1 Green
@@ -70,7 +70,6 @@ window.onload = function init() {
 		...etc
 	*/
 	for(let i = 0; i < freq_bars_sliders.length; i++){
-
 		//	i=3, i=7, and i=11 are opacity sliders. They have a different scale
 		if(i === 3 || i === 7 || i === 11){
 			noUiSlider.create(freq_bars_sliders[i],{
@@ -79,6 +78,18 @@ window.onload = function init() {
 				range: {
 					'min': 0,
 					'max': 1.0
+				},
+				connect: [true, false]
+			});
+		}
+		//	i=12 is the BAR COUNT slider.
+		else if(i === 12){
+			noUiSlider.create(freq_bars_sliders[i],{
+				start: 9,
+				step: 1,
+				range: {
+					'min': 5,
+					'max': 14
 				},
 				connect: [true, false]
 			});
@@ -100,16 +111,10 @@ window.onload = function init() {
 	}
 
 
-	/*
-		Preset 1:
-		grd.addColorStop(0, 'rgba(100, 200, 230, 1)');
-		grd.addColorStop(1, 'rgba(102, 102, 255, 0.5)');
-		canvasCtx.fillStyle = 'rgb(' + (barHeight+100) + ',100,250)';
-	*/
-
+	//	**************PRESET STYLE SELECTION**************
 	const BARS_PRESETS = document.getElementsByClassName('bars-presets');
 
-	//	1980's Miami Preset
+	//	Blue Sky
 	BARS_PRESETS[0].addEventListener('click', function(){
 		freq_bars_sliders[0].noUiSlider.set(100);
 		freq_bars_sliders[1].noUiSlider.set(200);
@@ -129,21 +134,72 @@ window.onload = function init() {
 		BARS_PRESETS[0].className = "bars-presets generic-menu-item selected";
 	});
 
+	//	Neon Purple
+	BARS_PRESETS[1].addEventListener('click', function(){
+		freq_bars_sliders[0].noUiSlider.set(255);
+		freq_bars_sliders[1].noUiSlider.set(74);
+		freq_bars_sliders[2].noUiSlider.set(243);
+		freq_bars_sliders[3].noUiSlider.set(1.0);
+		freq_bars_sliders[4].noUiSlider.set(0);
+		freq_bars_sliders[5].noUiSlider.set(17);
+		freq_bars_sliders[6].noUiSlider.set(20);
+		freq_bars_sliders[7].noUiSlider.set(0.63);
+		freq_bars_sliders[8].noUiSlider.set(55);
+		freq_bars_sliders[9].noUiSlider.set(227);
+		freq_bars_sliders[10].noUiSlider.set(101);
+		freq_bars_sliders[11].noUiSlider.set(1.0);
+		for(let i=0; i<BARS_PRESETS.length; i++){
+			BARS_PRESETS[i].className = "bars-presets generic-menu-item";
+		}
+		BARS_PRESETS[1].className = "bars-presets generic-menu-item selected";
+	});
+
+	//	Twilight
+	BARS_PRESETS[2].addEventListener('click', function(){
+		freq_bars_sliders[0].noUiSlider.set(0);
+		freq_bars_sliders[1].noUiSlider.set(0);
+		freq_bars_sliders[2].noUiSlider.set(49);
+		freq_bars_sliders[3].noUiSlider.set(1.0);
+		freq_bars_sliders[4].noUiSlider.set(19);
+		freq_bars_sliders[5].noUiSlider.set(0);
+		freq_bars_sliders[6].noUiSlider.set(0);
+		freq_bars_sliders[7].noUiSlider.set(0.85);
+		freq_bars_sliders[8].noUiSlider.set(9);
+		freq_bars_sliders[9].noUiSlider.set(255);
+		freq_bars_sliders[10].noUiSlider.set(255);
+		freq_bars_sliders[11].noUiSlider.set(0.15);
+		for(let i=0; i<BARS_PRESETS.length; i++){
+			BARS_PRESETS[i].className = "bars-presets generic-menu-item";
+		}
+		BARS_PRESETS[2].className = "bars-presets generic-menu-item selected";
+	});
+
 	//	Manually default to this preset
 	BARS_PRESETS[0].click();
 }
 
-function setFreqBarsColors(){
-	for(let i=0; i<freq_bars_sliders.length; i++){
-		if(typeof freq_bars_sliders[i].noUiSlider != 'undefined'){
-			if(i === 3 || i === 7 || i === 11){
-				freq_bars_values[i].innerHTML = freq_bars_sliders[i].noUiSlider.get();
-			}
-			else{
-				freq_bars_values[i].innerHTML = Math.round(freq_bars_sliders[i].noUiSlider.get());
-			}
+//	**************	Menu stuff	**************
+function initMenu(){
+	//	DOM Elements
+	const SETTINGS_BUTTON = document.getElementById('settings-button');
+	const SIDE_MENU = document.getElementById('side-menu');
+
+	//	Toggle menu open/close
+	var open = false
+	SETTINGS_BUTTON.addEventListener('click', function(){
+		if(open == false){
+			open = true;
+			SETTINGS_BUTTON.style.transform = 'translate(506px, 0px)';
+			SETTINGS_BUTTON.className = 'fa fa-arrow-left fa-2x';
+			SIDE_MENU.style.transform = 'translateX(0px)';
 		}
-	}
+		else{
+			open = false;
+			SETTINGS_BUTTON.style.transform = 'translate(0px, 0px)';
+			SETTINGS_BUTTON.className = 'fa fa-arrow-right fa-2x';
+			SIDE_MENU.style.transform = 'translateX(-510px)';
+		}
+	});
 }
 
 // Resize the Canvas every frame to match the browser size
@@ -152,28 +208,29 @@ function resizeCanvas(){
 	canvasCtx.canvas.height = window.innerHeight;
 }
 
-//
+
 function visualizeFrequencyBars(){
 
-	//	Max size: 32768
-	//	Must be a power of 2
-	ANALYSER.fftSize = 512;
-
-	/*
-	 *	The frequency bin count is always half of fftSize.
-	 *	Since the frequency bands are split evenly, each element
-	 *	N in dataArray will correspond to:
-
-	 *	N * sampleRate / fftSize
-	 *
-	 *	Note that the Audio Context defaults to sampleRate = 48000
-	 */
-
-	var bufferLength = ANALYSER.frequencyBinCount;
-	var dataArray = new Uint8Array(bufferLength);
-	//	canvasCtx.clearRect(0,0,canvasCtx.canvas.width,canvasCtx.canvas.height);
-
 	function draw() {
+
+		//	Read the value from the appropriate settings slider
+		var bar_count = Math.pow(2, Math.round(freq_bars_sliders[12].noUiSlider.get()));
+
+		//	Max size: 32768
+		//	Must be a power of 2
+		ANALYSER.fftSize = bar_count;
+
+		/*
+		 *	The frequency bin count is always half of fftSize.
+		 *	Since the frequency bands are split evenly, each element
+		 *	N in dataArray will correspond to:
+
+		 *	N * sampleRate / fftSize
+		 *
+		 *	Note that the Audio Context defaults to sampleRate = 48000
+		 */
+		var bufferLength = ANALYSER.frequencyBinCount;
+		var dataArray = new Uint8Array(bufferLength);
 
 		/*
 		 *	Dynamically resize the canvas every frame to match the browser size.
@@ -187,26 +244,23 @@ function visualizeFrequencyBars(){
 		//	Fills 'dataArray' with frequency data from the audio source.
 		ANALYSER.getByteFrequencyData(dataArray);
 
-		var barWidth = (canvasCtx.canvas.width / bufferLength) * 1.5;
-		var barHeight;
-		var x = 0;
 
 		//	Get the color values from the slider settings
 		//	Background 1 RGBA colors
-		let background1_r = Math.round(freq_bars_sliders[0].noUiSlider.get());
-		let background1_g = Math.round(freq_bars_sliders[1].noUiSlider.get());
-		let background1_b = Math.round(freq_bars_sliders[2].noUiSlider.get());
-		let background1_a = freq_bars_sliders[3].noUiSlider.get();
+		var background1_r = Math.round(freq_bars_sliders[0].noUiSlider.get());
+		var background1_g = Math.round(freq_bars_sliders[1].noUiSlider.get());
+		var background1_b = Math.round(freq_bars_sliders[2].noUiSlider.get());
+		var background1_a = freq_bars_sliders[3].noUiSlider.get();
 		//	Background 2 RGBA colors
-		let background2_r = Math.round(freq_bars_sliders[4].noUiSlider.get());
-		let background2_g = Math.round(freq_bars_sliders[5].noUiSlider.get());
-		let background2_b = Math.round(freq_bars_sliders[6].noUiSlider.get());
-		let background2_a = freq_bars_sliders[7].noUiSlider.get();
+		var background2_r = Math.round(freq_bars_sliders[4].noUiSlider.get());
+		var background2_g = Math.round(freq_bars_sliders[5].noUiSlider.get());
+		var background2_b = Math.round(freq_bars_sliders[6].noUiSlider.get());
+		var background2_a = freq_bars_sliders[7].noUiSlider.get();
 		//	Bar Color RGBA colors
-		let barColor_r = Math.round(freq_bars_sliders[8].noUiSlider.get());
-		let barColor_g = Math.round(freq_bars_sliders[9].noUiSlider.get());
-		let barColor_b = Math.round(freq_bars_sliders[10].noUiSlider.get());
-		let barColor_a = freq_bars_sliders[11].noUiSlider.get();
+		var barColor_r = Math.round(freq_bars_sliders[8].noUiSlider.get());
+		var barColor_g = Math.round(freq_bars_sliders[9].noUiSlider.get());
+		var barColor_b = Math.round(freq_bars_sliders[10].noUiSlider.get());
+		var barColor_a = freq_bars_sliders[11].noUiSlider.get();
 
 		// Initialize the gradient color for the background
 		const grd = canvasCtx.createLinearGradient(0, 0, 170, canvasCtx.canvas.height);
@@ -218,6 +272,10 @@ function visualizeFrequencyBars(){
 		// Apply the gradient to the next rectangle to be drawn, then set it as the background
 		canvasCtx.fillStyle = grd;
 		canvasCtx.fillRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
+
+		var barWidth = (canvasCtx.canvas.width / bufferLength);
+		var barHeight;
+		var x = 0;
 
 		for(var i = 0; i < bufferLength; i++){
 			barHeight = Math.round(dataArray[i] * 1.4 + 10);

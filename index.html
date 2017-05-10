@@ -1,11 +1,79 @@
 <html>
 <head>
-	<script src="test.js" ></script> 
+	<script src="app.js" ></script>
+
+	<link href="external/nouislider.css" rel="stylesheet">
 	<link href="style.css" rel="stylesheet">
+
+	<!-- Font Awesome Icons -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+	<!-- Google Font -->
+	<link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
 </head>
 <body>
 	<canvas id="c"></canvas>
-	<div id="menu">Yooooooo</div>
-	<div id="menu2">An Audio Visualizer</div>
+	<i class="fa fa-arrow-right fa-2x" id="settings-button"></i>
+	<div id="side-menu">
+		<div class="section-header">Visualization Style</div>
+
+		<div class="visualization-items">Krazy Lines</div>
+
+		<div class="visualization-items selected">Frequency Bars</div>
+
+		<div class="visualization-items">Waveform</div>		
+
+		<div class="section-header">Style Settings</div>
+		<div id="bars-settings">
+
+			<div class="settings-subsection">Background Gradient Color 1</div>
+
+			<div class="slider-and-label">
+				<div class="slider-label">RED <strong id="bars-bgcolor1-red-value" class="slider-value"></strong></div>
+				<div id="bars-bgcolor1-red-slider" class="slider-bar"></div>
+			</div>
+
+			<div class="slider-and-label">
+				<div class="slider-label">GREEN <strong id="bars-bgcolor1-green-value" class="slider-value"></strong></div>
+				<div id="bars-bgcolor1-green-slider" class="slider-bar"></div>
+			</div>
+
+			<div class="slider-and-label">
+				<div class="slider-label">BLUE <strong id="bars-bgcolor1-blue-value" class="slider-value"></strong></div>
+				<div id="bars-bgcolor1-blue-slider" class="slider-bar"></div>
+			</div>
+
+			<div class="slider-and-label">
+				<div class="slider-label">OPACITY <strong id="bars-bgcolor-opacity1-value" class="slider-value"></strong></div>
+				<div id="bars-bgcolor1-opacity-slider" class="slider-bar"></div>
+			</div>
+
+			<div class="settings-subsection">Background Gradient Color 2</div>
+
+			<div class="slider-and-label">
+				<div class="slider-label">RED <strong id="bars-bgcolor2-red-value" class="slider-value"></strong></div>
+				<div id="bars-bgcolor2-red-slider" class="slider-bar"></div>
+			</div>
+
+			<div class="slider-and-label">
+				<div class="slider-label">GREEN <strong id="bars-bgcolor2-green-value" class="slider-value"></strong></div>
+				<div id="bars-bgcolor2-green-slider" class="slider-bar"></div>
+			</div>
+
+			<div class="slider-and-label">
+				<div class="slider-label">BLUE <strong id="bars-bgcolor2-blue-value" class="slider-value"></strong></div>
+				<div id="bars-bgcolor2-blue-slider" class="slider-bar"></div>
+			</div>
+
+			<div class="slider-and-label">
+				<div class="slider-label">OPACITY <strong id="bars-bgcolor2-opacity-value" class="slider-value"></strong></div>
+				<div id="bars-bgcolor2-opacity-slider" class="slider-bar"></div>
+			</div>
+		</div>
+
+	</div>
+	
+
+	<script src="external/nouislider.min.js" ></script> 
 </body>
 </html>

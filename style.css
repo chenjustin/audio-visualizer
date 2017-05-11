@@ -79,6 +79,12 @@ canvas{
 	font-family: Candara, Calibri, Segoe, "Segoe UI", Optinma, Arial, sans-serif;
 	font-size: 21px;
 }
+.settings-subsection p{
+	margin: 0;
+	padding: 12px 0px 0px 1px;
+	color: #DEDEDE;
+	font-size: 17px;
+}
 
 /*
 	Visualization Style Picker Stuff
@@ -121,18 +127,50 @@ canvas{
 	margin-top: 7px;
 }
 
-label{
+/*	Toggle switch	*/
+.switch{
+	position: relative;
 	display: inline-block;
+	width: 50px;
+	height: 23px;
+	margin-right: 28px;
+}
+.switch input{
+	display: none;
+}
+.toggle-switch{
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 2px;
+	right: 0;
+	bottom: 0;
+	transition: .4s;
+	border-radius: 34px;
+	background-color: rgba(65, 65, 65, 0.65);
+}
+.toggle-switch:before{
+	position: absolute;
+	content: "";
+	height: 19px;
+	width: 19px;
+	left: 4px;
+	bottom: 2px;
+	background-color: #dedede;
+	transition: .4s;
+	border-radius: 34px;
+}
+input:checked + .toggle-switch{
+	background-color: #23a5d5;
+}
+input:checked + .toggle-switch:before {
+  transform: translateX(22px);
+}
+.toggle-label{
+	padding: 0px 10px 15px 0px;
+	display: inline-block;
+	vertical-align: middle;
 	font-family: Arial, sans-serif;
 	color: #DEDEDE;
 	font-size: 15px;
-	vertical-align: middle;
-}
-input{
-	vertical-align: middle;
-	float: right;
-	width: 40px;
-	height: 40px;
-	border-color: red;
-	border-radius: 50%;
 }

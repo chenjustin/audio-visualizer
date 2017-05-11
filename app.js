@@ -6,6 +6,7 @@ var selected = '';
 //	"Frequency Bars" settings variables
 var freq_bars_sliders;
 var freq_bars_values;
+var freq_bars_checkboxes;
 //	Entry point for the whole app.
 window.onload = function init() {
 	//	Use sound card's "Stereo Mix" as the audio source, then connect it to ANALYSER
@@ -48,6 +49,7 @@ function initVizStyleChooser(){
 				//	Frequency Bars
 				case 1:
 					visualizeFrequencyBars();
+					break;
 			}
 		});
 	}
@@ -133,6 +135,9 @@ function initFreqBarsStyleSettings(){
 		freq_bars_sliders[i].noUiSlider.on('update', updateSliderDisplayValue);
 	}
 
+	//	Automation Checkboxes
+	freq_bars_checkboxes = document.getElementsByTagName('input');
+
 	//	**************PRESET STYLE SELECTION**************
 
 	//	Store all the preset choices into an array so we can programatically add
@@ -155,6 +160,9 @@ function initFreqBarsStyleSettings(){
 						let presetValue = presetSliderSettings[k];
 						freq_bars_sliders[k].noUiSlider.set(presetValue);
 					}
+					freq_bars_checkboxes[0].checked = true;
+					freq_bars_checkboxes[1].checked = false;
+					freq_bars_checkboxes[2].checked = false;
 					break;
 				//	Neon Purple
 				case 1:
@@ -163,14 +171,20 @@ function initFreqBarsStyleSettings(){
 						let presetValue = presetSliderSettings[k];
 						freq_bars_sliders[k].noUiSlider.set(presetValue);
 					}
+					freq_bars_checkboxes[0].checked = true;
+					freq_bars_checkboxes[1].checked = false;
+					freq_bars_checkboxes[2].checked = false;
 					break;
 				//	Twilight
 				case 2:
-					presetSliderSettings = [0, 0, 49, 1.0, 19, 0, 0, 0.85, 9, 255, 255, 0.15, 8];
+					presetSliderSettings = [0, 0, 49, 1.0, 19, 0, 0, 0.85, 51, 8, 206, 0.32, 9];
 					for(let k=0; k<freq_bars_sliders.length; k++){
 						let presetValue = presetSliderSettings[k];
 						freq_bars_sliders[k].noUiSlider.set(presetValue);
 					}
+					freq_bars_checkboxes[0].checked = false;
+					freq_bars_checkboxes[1].checked = true;
+					freq_bars_checkboxes[2].checked = true;
 					break;
 			}
 		});
@@ -264,18 +278,39 @@ function visualizeFrequencyBars(){
 		//	Color the background
 		grd.addColorStop(0, 'rgba('+ background1_r +', '+ background1_g +', '+ background1_b +', '+ background1_a +')');
 		grd.addColorStop(1, 'rgba('+ background2_r +', '+ background2_g +', '+ background2_b +', '+ background2_a +')');
-		// Apply the gradient to the next rectangle to be drawn, then set it as the background
+		//	Apply the gradient to the next rectangle to be drawn, then set it as the background
 		canvasCtx.fillStyle = grd;
 		canvasCtx.fillRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
-
+		//	Responsive Bar Colors
+		var responsiveBarColor_r = 0;
+		var responsiveBarColor_g = 0;
+		var responsiveBarColor_b = 0;
+		if(freq_bars_checkboxes[0].checked === true){
+			responsiveBarColor_r = 1;
+		}
+		else{
+			responsiveBarColor_r = 0;
+		}
+		if(freq_bars_checkboxes[1].checked === true){
+			responsiveBarColor_g = 1;
+		}
+		else{
+			responsiveBarColor_g = 0;
+		}
+		if(freq_bars_checkboxes[2].checked === true){
+			responsiveBarColor_b = 1;
+		}
+		else{
+			responsiveBarColor_b = 0;
+		}
+		//	Draw the bars
 		var barWidth = (canvasCtx.canvas.width / bufferLength);
 		var barHeight;
 		var x = 0;
-
 		for(var i = 0; i < bufferLength; i++){
 			barHeight = Math.round(dataArray[i] * 1.4 + 10);
 			//	RGB needs to take integers, so we need to round 'barHeight'.
-			canvasCtx.fillStyle = 'rgba(' + (dataArray[i] + barColor_r + 10) + ','+ barColor_g +', '+ barColor_b +', '+ barColor_a +')';
+			canvasCtx.fillStyle = 'rgba(' + ((dataArray[i]*responsiveBarColor_r) + barColor_r) + ','+ ((dataArray[i]*responsiveBarColor_g) + barColor_g) +', '+ ((dataArray[i]*responsiveBarColor_b) + barColor_b) +', '+ barColor_a +')';
 			canvasCtx.fillRect(x,canvasCtx.canvas.height-barHeight/2-canvasCtx.canvas.height/2, barWidth, barHeight);
 			x += barWidth + 1;
 		}

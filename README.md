@@ -1,19 +1,19 @@
 # Audio-Visualizer
 
-Customizable audio visualizers created with the Web Audio API + HTML5 Canvas. Animated imagery is generated based on audio input.
-This requires your browser's microphone access permission for proper functionality.
+Customizable audio visualizers created with the Web Audio API + HTML5 Canvas. An audio visualizer generates animated imagery based on audio input.
+This will require your browser's permission for microphone access to work.
 
-[Click here to check it out!](https://chenjustin.github.io/audio-visualizer/).
+[Click here to check it out](https://chenjustin.github.io/audio-visualizer/).
 
 Use Google Chrome for best results
 
-How to use
+How to use with sound-card input:
 ---
 1.  Open Windows sound settings
 2.  Click on the "Recording" tab
 3.  Set the default device to "Stereo Mix"
 
-The visualizer should now respond to your PC's sound output. Try watching the visuals while listening to some nice tunes :)
+The visualizer should now respond to your PC's sound output. Try watching the visuals while listening to some sick tunes :)
 
 If you don't see Stereo Mix listed as a recording device, right click the page and check "Show Disabled Devices".
 

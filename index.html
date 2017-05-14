@@ -15,15 +15,98 @@
 	<i class="fa fa-arrow-right fa-2x" id="settings-button"></i>
 	<div id="side-menu">
 
-
-		<div class="viz-settings-visibility">
-		</div>
-
 		<div class="section-header">Visualization Style</div>
 		<div class="viz-style generic-menu-item">Windmill</div>
 		<div class="viz-style generic-menu-item">Frequency Bars</div>
-		<div class="viz-style generic-menu-item">Waveform</div>		
+		<div class="viz-style generic-menu-item">Waveform</div>
+
 		<div class="section-header">Style Settings</div>
+
+		<!--	BEGIN WINDMILL SETTINGS	-->
+		<div class="viz-settings-visibility">
+			<div class="settings-subsection">Style Presets</div>
+
+			<div class="windmill-presets generic-menu-item">Default</div>
+
+			<div class="settings-subsection">Background Gradient Color 1</div>
+
+			<div class="settings-item-container">
+				<div class="slider-label">RED <strong class="windmill-slider-value slider-value"></strong></div>
+				<div class="windmill-slider slider"></div>
+			</div>
+
+			<div class="settings-item-container">
+				<div class="slider-label">GREEN <strong class="windmill-slider-value slider-value"></strong></div>
+				<div class="windmill-slider slider"></div>
+			</div>
+
+			<div class="settings-item-container">
+				<div class="slider-label">BLUE <strong class="windmill-slider-value slider-value"></strong></div>
+				<div class="windmill-slider slider"></div>
+			</div>
+
+			<div class="settings-item-container">
+				<div class="slider-label">OPACITY <strong class="windmill-slider-value slider-value"></strong></div>
+				<div class="windmill-slider slider"></div>
+			</div>
+
+			<div class="settings-subsection">Background Gradient Color 2</div>
+
+			<div class="settings-item-container">
+				<div class="slider-label">RED <strong class="windmill-slider-value slider-value"></strong></div>
+				<div class="windmill-slider slider"></div>
+			</div>
+
+			<div class="settings-item-container">
+				<div class="slider-label">GREEN <strong class="windmill-slider-value slider-value"></strong></div>
+				<div class="windmill-slider slider"></div>
+			</div>
+
+			<div class="settings-item-container">
+				<div class="slider-label">BLUE <strong class="windmill-slider-value slider-value"></strong></div>
+				<div class="windmill-slider slider"></div>
+			</div>
+
+			<div class="settings-item-container">
+				<div class="slider-label">OPACITY <strong class="windmill-slider-value slider-value"></strong></div>
+				<div class="windmill-slider slider"></div>
+			</div>
+
+			<div class="settings-subsection">Windmill Blade Colors</div>
+
+			<div class="settings-item-container">
+					<div class="toggle-label">TOGGLE RAINBOW BLADES</div>
+					<label class="switch">
+						<input type="checkbox" class="toggle-windmill">
+						<div class="toggle-switch"></div>
+					</label>
+			</div>
+
+			<div id="hidden-windmill-sliders">
+				<div class="settings-item-container">
+					<div class="slider-label">RED <strong class="windmill-slider-value slider-value"></strong></div>
+					<div class="windmill-slider slider"></div>
+				</div>
+
+				<div class="settings-item-container">
+					<div class="slider-label">GREEN <strong class="windmill-slider-value slider-value"></strong></div>
+					<div class="windmill-slider slider"></div>
+				</div>
+
+				<div class="settings-item-container">
+					<div class="slider-label">BLUE <strong class="windmill-slider-value slider-value"></strong></div>
+					<div class="windmill-slider slider"></div>
+				</div>
+
+				<div class="settings-item-container">
+					<div class="slider-label">OPACITY <strong class="windmill-slider-value slider-value"></strong></div>
+					<div class="windmill-slider slider"></div>
+				</div>
+			</div>
+
+		</div>
+		<!--	END WINDMILL SETTINGS	-->
+		<!--	BEGIN FREQUENCY BARS SETTINGS	-->
 		<div id="bars-settings" class="viz-settings-visibility">
 
 			<div class="settings-subsection">Style Presets</div>
@@ -107,17 +190,17 @@
 			<div class="settings-item-container">
 					<div class="toggle-label">RED</div>
 					<label class="switch">
-						<input type="checkbox">
+						<input type="checkbox" class="freq-bars-responsive">
 						<div class="toggle-switch"></div>
 					</label>
 					<div class="toggle-label">GREEN</div>
 					<label class="switch">
-						<input type="checkbox">
+						<input type="checkbox" class="freq-bars-responsive">
 						<div class="toggle-switch"></div>
 					</label>
 					<div class="toggle-label">BLUE</div>
 					<label class="switch">
-						<input type="checkbox">
+						<input type="checkbox" class="freq-bars-responsive">
 						<div class="toggle-switch"></div>
 					</label>
 			</div>
@@ -134,7 +217,8 @@
 				<div class="freq-bars-slider slider"></div>
 			</div>
 		</div>
-		
+		<!--END FREQUENCY BARS SETTINGS-->
+
 		<div class="viz-settings-visibility">
 		</div>
 

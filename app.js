@@ -127,7 +127,7 @@ function initWindmillStyleSettings(){
 	function updateSliderDisplayValue(){
 		for(let i=0; i<windmill_sliders.length; i++){
 			if(typeof windmill_sliders[i].noUiSlider != 'undefined'){
-				if(i === 3 || i === 7 || i === 11 ){
+				if(i === 3 || i === 7 || i === 8 || i === 12 || i === 13){
 					windmill_sliders_values[i].innerHTML = windmill_sliders[i].noUiSlider.get();
 				}
 				else{
@@ -139,13 +139,38 @@ function initWindmillStyleSettings(){
 
 	function createSliders(){
 		for(let i=0; i<windmill_sliders.length;i++){
-			if(i === 3 || i === 7 || i === 11 ){
+			//	Alphas
+			if(i === 3 || i === 7 || i === 12 ){
 				noUiSlider.create(windmill_sliders[i],{
 						start: 1,
 						step: 0.01,
 						range: {
 							'min': 0,
 							'max': 1.0
+						},
+						connect: [true, false]
+				});
+			}
+			//	Chaos slider
+			else if(i === 13){
+				noUiSlider.create(windmill_sliders[i],{
+						start: 0,
+						step: 0.01,
+						range: {
+							'min': 0,
+							'max': 3.5
+						},
+						connect: [true, false]
+				});
+			}
+			//	Blade Width
+			else if(i === 8){
+				noUiSlider.create(windmill_sliders[i],{
+						start: 0.5,
+						step: 0.1,
+						range: {
+							'min': 0.2,
+							'max': 5.0
 						},
 						connect: [true, false]
 				});
@@ -182,7 +207,7 @@ function initWindmillStyleSettings(){
 			switch(i){
 				//	Default
 				case 0:
-					presetSliderSettings = [120,120,120,1, 120,120,120,1, 120,120,120,1];
+					presetSliderSettings = [120,120,120,1, 120,120,120,1, 0.2, 120,120,120,1, 0];
 					for(let k=0; k<windmill_sliders.length; k++){
 						let presetValue = presetSliderSettings[k];
 						windmill_sliders[k].noUiSlider.set(presetValue);
@@ -220,6 +245,8 @@ function visualizeWindmill(){
 	var useRainbowBlades;
 	var bladeStyle1, bladeStyle2;
 
+	var chaos;
+
 	function readSliders(){
 		//	Get the color values from the slider settings
 		//	Background 1 RGBA colors
@@ -235,10 +262,14 @@ function visualizeWindmill(){
 		background2_a = windmill_sliders[7].noUiSlider.get();
 
 		//	Blade RGBA colors
-		blade_r = Math.round(windmill_sliders[8].noUiSlider.get());
-		blade_g = Math.round(windmill_sliders[9].noUiSlider.get());
-		blade_b = Math.round(windmill_sliders[10].noUiSlider.get());
-		blade_a = windmill_sliders[11].noUiSlider.get();
+		blade_r = Math.round(windmill_sliders[9].noUiSlider.get());
+		blade_g = Math.round(windmill_sliders[10].noUiSlider.get());
+		blade_b = Math.round(windmill_sliders[11].noUiSlider.get());
+		blade_a = windmill_sliders[12].noUiSlider.get();
+
+		chaos = windmill_sliders[13].noUiSlider.get();
+
+		bladeWidth = windmill_sliders[8].noUiSlider.get();
 
 		if(windmill_checkboxes[0].checked === false){
 			document.getElementById('hidden-windmill-sliders').style = 'display: block;'
@@ -260,7 +291,7 @@ function visualizeWindmill(){
 				bladeStyle1 = 'rgba(' + blade_r + ',' + blade_g + ',' + blade_b + ',' + blade_a + ')';
 				bladeStyle2 = 'rgba(' + blade_r + ',' + blade_g + ',' + blade_b + ',' + blade_a + ')';
 			}
-			radius = Math.round(20 + (Math.pow(i, 1.8)));
+			radius = Math.round(20 + (Math.pow(i, 1.8))) + dataArray[i]*chaos;
 			arcStart = (i/24) + rotation;
 			arcEnd = (i/24) + rotation + Math.pow(dataArray[i*2]/200, 4);
 
@@ -269,28 +300,28 @@ function visualizeWindmill(){
 				canvasCtx.beginPath();
 				canvasCtx.lineCap ='round';
 				canvasCtx.strokeStyle = bladeStyle1;
-				canvasCtx.arc(WIDTH/2, HEIGHT/2, radius + j/2, arcStart, arcEnd);
+				canvasCtx.arc(WIDTH/2, HEIGHT/2, radius + (j*bladeWidth), arcStart, arcEnd);
 				canvasCtx.stroke();
 
 				//	Second blade
 				canvasCtx.beginPath();
 				canvasCtx.lineCap ='round';
 				canvasCtx.strokeStyle = bladeStyle2;
-				canvasCtx.arc(WIDTH/2, HEIGHT/2, radius + j/2, arcStart + (Math.PI*2/4), arcEnd + (Math.PI*2/4));
+				canvasCtx.arc(WIDTH/2, HEIGHT/2, radius + (j*bladeWidth), arcStart + (Math.PI*2/4), arcEnd + (Math.PI*2/4));
 				canvasCtx.stroke();
 
 				//	Third Blade
 				canvasCtx.beginPath();
 				canvasCtx.lineCap ='round';
 				canvasCtx.strokeStyle = bladeStyle1;
-				canvasCtx.arc(WIDTH/2, HEIGHT/2, radius + j/2, arcStart + (Math.PI*2/4*2), arcEnd + (Math.PI*2/4*2));
+				canvasCtx.arc(WIDTH/2, HEIGHT/2, radius + (j*bladeWidth), arcStart + (Math.PI*2/4*2), arcEnd + (Math.PI*2/4*2));
 				canvasCtx.stroke();
 
 				//	Fourth Blade
 				canvasCtx.beginPath();
 				canvasCtx.lineCap ='round';
 				canvasCtx.strokeStyle = bladeStyle2;
-				canvasCtx.arc(WIDTH/2, HEIGHT/2, radius + j/2, arcStart + (Math.PI*2/4*3), arcEnd + (Math.PI*2/4*3));
+				canvasCtx.arc(WIDTH/2, HEIGHT/2, radius + (j*bladeWidth), arcStart + (Math.PI*2/4*3), arcEnd + (Math.PI*2/4*3));
 				canvasCtx.stroke();
 			}
 		}

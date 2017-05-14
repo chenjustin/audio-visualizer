@@ -8,6 +8,23 @@ var freq_bars_sliders;
 var freq_bars_values;
 var freq_bars_checkboxes;
 
+//	FPS counter for testing
+var lastLoop = (new Date()).getMilliseconds();
+var fpsCounter = 1;
+var fps = 0;
+var showFPS = function(){
+	var currentLoop = (new Date()).getMilliseconds();
+		if(lastLoop > currentLoop){
+			fps = fpsCounter;
+			fpsCounter = 1;
+		}
+		else{
+			fpsCounter += 1;
+		}
+		lastLoop = currentLoop;
+		console.log(fps);
+}
+
 //	Entry point to the whole app
 window.onload = function init() {
 	//	Use sound card's "Stereo Mix" as the audio source, then connect it to ANALYSER
@@ -29,6 +46,8 @@ window.onload = function init() {
 //	**************	Visualization style selection	**************
 function initVizStyleChooser(){
 	const STYLES = document.getElementsByClassName('viz-style');
+	const STYLE_SETTINGS_MENU = document.getElementsByClassName('viz-settings-visibility');
+	
 	for(let i=0; i<STYLES.length; i++){
 		STYLES[i].addEventListener('click', function(){
 			//	Clear any existing canvas
@@ -36,21 +55,25 @@ function initVizStyleChooser(){
 			for(let i=0; i<toClear.length; i++){
 				toClear[i].remove();
 			}
+
 			//	Deselect all the other Styles
 			for(let j=0; j<STYLES.length; j++){
 				STYLES[j].className = 'viz-style generic-menu-item';
+				STYLE_SETTINGS_MENU[j].style = "display: none;"
 			}
+
 			STYLES[i].className = 'viz-style generic-menu-item selected';
 			selected = STYLES[i].innerHTML;
 
 			switch(i){
-				//	Tubular
+				//	Windmill
 				case 0:
-					visualizeTubular();
+					visualizeWindmill();
 					break;
 				//	Frequency Bars
 				case 1:
 					visualizeFrequencyBars();
+					STYLE_SETTINGS_MENU[i].style = "display: block;"
 					break;
 				case 2:
 					visualizeWaveform();
@@ -59,7 +82,7 @@ function initVizStyleChooser(){
 		});
 	}
 	//	"Frequency Bars" is the default style when the app starts
-	STYLES[0].click();
+	STYLES[1].click();
 }
 
 //	**************	"Frequency Bars" Style Settings 	**************
@@ -250,16 +273,29 @@ function visualizeFrequencyBars(){
 	document.body.appendChild(canvasElement);
 	var canvasCtx = document.getElementById('c').getContext('2d');
 
+	//	Declare variables here to avoid garbage collection in the draw() loop for better performance
+	var bar_count;
+	var bufferLength;
+	var dataArray;
+	var grd;
+	var background1_r, background1_g, background1_b, background1_a,
+	background2_r, background2_g, background2_b, background2_a,
+	barColor_r, barColor_g, barColor_b, barColor_a,
+	barHeight_setting, responsiveBarColor_r, responsiveBarColor_g, responsiveBarColor_b;
+	var barWidth, barHeight, x;
+
 	function draw() {
+		showFPS();
+
 		//	Resize the canvas every frame to match the window size
-		canvasCtx.canvas.width = window.innerWidth;
-		canvasCtx.canvas.height = window.innerHeight;
+		canvasCtx.canvas.width = WIDTH = window.innerWidth;
+		canvasCtx.canvas.height = HEIGHT = window.innerHeight;
 		//	Check if this is still the selected visualization style
 		if(selected === 'Frequency Bars'){
 			requestAnimationFrame(draw);
 		}
 		//	Read the value from the appropriate settings slider
-		var bar_count = Math.pow(2, Math.round(freq_bars_sliders[12].noUiSlider.get()));
+		bar_count = Math.pow(2, Math.round(freq_bars_sliders[12].noUiSlider.get()));
 		//	Max size: 32768
 		//	Must be a power of 2
 		ANALYSER.fftSize = bar_count;
@@ -272,45 +308,45 @@ function visualizeFrequencyBars(){
 		 *
 		 *	Note that the Audio Context defaults to sampleRate = 48000
 		 */
-		var bufferLength = ANALYSER.frequencyBinCount;
-		var dataArray = new Uint8Array(bufferLength);
+		bufferLength = ANALYSER.frequencyBinCount;
+		dataArray = new Uint8Array(bufferLength);
 		//	Fills 'dataArray' with frequency data from the audio source.
 		ANALYSER.getByteFrequencyData(dataArray);
 
 		//	Get the color values from the slider settings
 		//	Background 1 RGBA colors
-		var background1_r = Math.round(freq_bars_sliders[0].noUiSlider.get());
-		var background1_g = Math.round(freq_bars_sliders[1].noUiSlider.get());
-		var background1_b = Math.round(freq_bars_sliders[2].noUiSlider.get());
-		var background1_a = freq_bars_sliders[3].noUiSlider.get();
+		background1_r = Math.round(freq_bars_sliders[0].noUiSlider.get());
+		background1_g = Math.round(freq_bars_sliders[1].noUiSlider.get());
+		background1_b = Math.round(freq_bars_sliders[2].noUiSlider.get());
+		background1_a = freq_bars_sliders[3].noUiSlider.get();
 
 		//	Background 2 RGBA colors
-		var background2_r = Math.round(freq_bars_sliders[4].noUiSlider.get());
-		var background2_g = Math.round(freq_bars_sliders[5].noUiSlider.get());
-		var background2_b = Math.round(freq_bars_sliders[6].noUiSlider.get());
-		var background2_a = freq_bars_sliders[7].noUiSlider.get();
+		background2_r = Math.round(freq_bars_sliders[4].noUiSlider.get());
+		background2_g = Math.round(freq_bars_sliders[5].noUiSlider.get());
+		background2_b = Math.round(freq_bars_sliders[6].noUiSlider.get());
+		background2_a = freq_bars_sliders[7].noUiSlider.get();
 
 		//	Bar Color RGBA colors
-		var barColor_r = Math.round(freq_bars_sliders[8].noUiSlider.get());
-		var barColor_g = Math.round(freq_bars_sliders[9].noUiSlider.get());
-		var barColor_b = Math.round(freq_bars_sliders[10].noUiSlider.get());
-		var barColor_a = freq_bars_sliders[11].noUiSlider.get();
+		barColor_r = Math.round(freq_bars_sliders[8].noUiSlider.get());
+		barColor_g = Math.round(freq_bars_sliders[9].noUiSlider.get());
+		barColor_b = Math.round(freq_bars_sliders[10].noUiSlider.get());
+		barColor_a = freq_bars_sliders[11].noUiSlider.get();
 
 		//	Bar Height slider
-		var barHeight_setting = freq_bars_sliders[13].noUiSlider.get();
+		barHeight_setting = freq_bars_sliders[13].noUiSlider.get();
 
 		// Initialize the gradient color for the background
-		const grd = canvasCtx.createLinearGradient(0, 0, 170, canvasCtx.canvas.height);
+		grd = canvasCtx.createLinearGradient(0, 0, 170, HEIGHT);
 		//	Color the background
 		grd.addColorStop(0, 'rgba('+ background1_r +', '+ background1_g +', '+ background1_b +', '+ background1_a +')');
 		grd.addColorStop(1, 'rgba('+ background2_r +', '+ background2_g +', '+ background2_b +', '+ background2_a +')');
-		//	Apply the gradient to the next rectangle to be drawn, then set it as the background
 		canvasCtx.fillStyle = grd;
-		canvasCtx.fillRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
+		canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 		//	Responsive Bar Colors
-		var responsiveBarColor_r = 0;
-		var responsiveBarColor_g = 0;
-		var responsiveBarColor_b = 0;
+		responsiveBarColor_r = 0;
+		responsiveBarColor_g = 0;
+		responsiveBarColor_b = 0;
+
 		if(freq_bars_checkboxes[0].checked === true){
 			responsiveBarColor_r = 1;
 		}
@@ -329,129 +365,154 @@ function visualizeFrequencyBars(){
 		else{
 			responsiveBarColor_b = 0;
 		}
+
 		//	Draw the bars
-		var barWidth = (canvasCtx.canvas.width / bufferLength);
-		var barHeight;
-		var x = 0;
-		for(var i = 0; i < bufferLength; i++){
-			barHeight = Math.round(window.innerHeight*barHeight_setting*(dataArray[i] / 256)+10);
+		barWidth = (WIDTH / bufferLength);
+		x = 0;
+		for(let i = 0; i < bufferLength; i++){
 			//	RGB needs to take integers, so we need to round 'barHeight'.
+			barHeight = Math.round(window.innerHeight*barHeight_setting*(dataArray[i] / 256)+10);
 			canvasCtx.fillStyle = 'rgba(' + ((dataArray[i]*responsiveBarColor_r) + barColor_r) + ','+ ((dataArray[i]*responsiveBarColor_g) + barColor_g) +', '+ ((dataArray[i]*responsiveBarColor_b) + barColor_b) +', '+ barColor_a +')';
-			canvasCtx.fillRect(x,canvasCtx.canvas.height-barHeight/2-canvasCtx.canvas.height/2, barWidth, barHeight);
+			canvasCtx.fillRect(x,HEIGHT-barHeight/2-HEIGHT/2, barWidth, barHeight);
 			x += barWidth + 1;
 		}
 	}
 	draw();
 }
 
-function visualizeTubular(){
+function visualizeWindmill(){
 	//	Create a new Canvas element and insert it into the DOM
 	var canvasElement = document.createElement('canvas')
 	canvasElement.setAttribute('id', 's');
 	document.body.appendChild(canvasElement);
 	canvasCtx = document.getElementById('s').getContext('2d');
 
-	var rotation = 0;
-	var velocity = 0;
+	var rotation = velocity = 0;
+
+	ANALYSER.fftSize = 512;
+
+	var bufferLength = ANALYSER.frequencyBinCount;
+	var dataArray = new Uint8Array(bufferLength);
+
+	var grd, t;
+	var radius, arcStart, arcEnd, WIDTH, HEIGHT;
 
 	function draw() {
+		//	Count FPS
+		showFPS();
+
 		//	Resize the canvas every frame to match the window size
-		canvasCtx.canvas.width = window.innerWidth;
-		canvasCtx.canvas.height = window.innerHeight;
-		const WIDTH = canvasCtx.canvas.width;
-		const HEIGHT = canvasCtx.canvas.height;
+		canvasCtx.canvas.width = WIDTH = window.innerWidth;
+		canvasCtx.canvas.height = HEIGHT = window.innerHeight;
 
 		//	Check if this is still the selected visualization style
-		if(selected === 'Tubular'){
+		if(selected === 'Windmill'){
 			requestAnimationFrame(draw);
 		}
-		ANALYSER.fftSize = 512;
-
-		var bufferLength = ANALYSER.frequencyBinCount;
-		var dataArray = new Uint8Array(bufferLength);
 		//	Fills 'dataArray' with frequency data from the audio source.
 		ANALYSER.getByteFrequencyData(dataArray);
 
-		const grd = canvasCtx.createLinearGradient(0, 0, 170, HEIGHT);
+		grd = canvasCtx.createLinearGradient(0, 0, 170, HEIGHT);
 		//	Color the background
 		grd.addColorStop(0, 'rgba(5, 5, 15, 1.0)');
-		grd.addColorStop(1, 'rgba(5, 10, 15, 1.0)');
+		grd.addColorStop(1, 'rgba(5, 10, 25, 1.0)');
 		//	Apply the gradient to the next rectangle to be drawn, then set it as the background
 		canvasCtx.fillStyle = grd;
 		canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
-		rotation += dataArray[3]/15000
-		console.log(0);
+
+		rotation += dataArray[15]/8000;
 		if(rotation < 2*Math.PI){
-			//rotation += (Math.PI/360)
+			 rotation += (Math.PI/4000);
 		}
 		else{
 			rotation = 0;
 		}
 
-		if(velocity < 120){
-			velocity += 1;
+		if(velocity < 100){
+			velocity += 0;
 		}
 		else{
 			velocity = 0;
 		}
 
-		for(let i=1; i< 60; i+= 1){
-			const radius = 50 + (Math.pow(i, 1.8)) + velocity;
-			const arcStart = (i/24) + rotation;
-			const arcEnd = (Math.PI/12)+(i/24)+(i/100) + rotation;
+		for(let i=1; i< 50; i+= 1){
+			radius = Math.round(20 + (Math.pow(i, 1.8)) + velocity);
+			arcStart = (i/24) + rotation;
+			arcEnd = (i/24) + rotation + Math.pow(dataArray[i]/200, 4);
 
-			//	First "blade"
-			canvasCtx.beginPath();
-			canvasCtx.lineWidth = Math.pow((i/5), 1.2);
-			canvasCtx.strokeStyle = 'rgba(250, 250, 250, 1.0)';
-			canvasCtx.arc(WIDTH/2, HEIGHT/2, radius, arcStart, arcEnd);
-			canvasCtx.stroke();
-			canvasCtx.closePath();
+			for(let j=1; j<7; j++){
+				//	First "blade"
+				canvasCtx.beginPath();
+				canvasCtx.lineCap ='round';
+				canvasCtx.strokeStyle = 'hsl(' + (360-(i*10)) + ',100%, 50%)';
+				canvasCtx.arc(WIDTH/2, HEIGHT/2, radius + j/2, arcStart, arcEnd);
+				canvasCtx.stroke();
+			}
 
-			//	Second blade
-			canvasCtx.beginPath();
-			canvasCtx.lineWidth = Math.pow((i/5), 1.2);
-			canvasCtx.strokeStyle = 'rgba(250, 250, 250, 1.0)';
-			canvasCtx.arc(WIDTH/2, HEIGHT/2, radius, arcStart + (Math.PI*2/3), arcEnd + (Math.PI*2/3));
-			canvasCtx.stroke();
-			canvasCtx.closePath();
+			for(let j=1; j<7; j++){
+				//	Second blade
+				canvasCtx.beginPath();
+				canvasCtx.lineCap ='round';
+				canvasCtx.strokeStyle = 'hsl(' + (i*10) + ',100%, 50%)';
+				canvasCtx.arc(WIDTH/2, HEIGHT/2, radius + j/2, arcStart + (Math.PI*2/4), arcEnd + (Math.PI*2/4));
+				canvasCtx.stroke();
+			}
 
-			//	Third Blade
-			canvasCtx.beginPath();
-			canvasCtx.lineWidth = Math.pow((i/5), 1.2);
-			canvasCtx.strokeStyle = 'rgba(250, 250, 250, 1.0)';
-			canvasCtx.arc(WIDTH/2, HEIGHT/2, radius, arcStart + (Math.PI*2/3*2), arcEnd + (Math.PI*2/3*2));
-			canvasCtx.stroke();
-			canvasCtx.closePath();
+			for(let j=1; j<7; j++){
+				//	Third Blade
+				canvasCtx.beginPath();
+				canvasCtx.lineCap ='round';
+				canvasCtx.strokeStyle = 'hsl(' + (360-(i*10)) + ',100%, 50%)';
+				canvasCtx.arc(WIDTH/2, HEIGHT/2, radius + j/2, arcStart + (Math.PI*2/4*2), arcEnd + (Math.PI*2/4*2));
+				canvasCtx.stroke();
+			}
+
+			for(let j=1; j<7; j++){
+				//	Fourth Blade
+				canvasCtx.beginPath();
+				canvasCtx.lineCap ='round';
+				canvasCtx.strokeStyle = 'hsl(' + (i*10) + ',100%, 50%)';
+				canvasCtx.arc(WIDTH/2, HEIGHT/2, radius + j/2, arcStart + (Math.PI*2/4*3), arcEnd + (Math.PI*2/4*3));
+				canvasCtx.stroke();
+			}
 		}
 
 		//	Random stuff
+		
 		canvasCtx.beginPath();
 		canvasCtx.arc(WIDTH/2, HEIGHT/2, dataArray[25]/2+100, 0, 2 * Math.PI);
-		canvasCtx.fillStyle = '#000000';
+		canvasCtx.fillStyle = 'rgba(0,0,0,0.8)';
 		canvasCtx.fill();
-		canvasCtx.closePath();
 
 		canvasCtx.beginPath();
-		canvasCtx.strokeStyle = 'rgba(150, 20, 100, 1.0)';
+		canvasCtx.strokeStyle = 'rgba(255, 255, 255, 1.0)';
+		canvasCtx.arc(WIDTH/2, HEIGHT/2, dataArray[25]/2+105, Math.PI - rotation, Math.PI + 2 - rotation);
 		canvasCtx.lineWidth = 4;
-		canvasCtx.arc(WIDTH/2, HEIGHT/2, dataArray[25]/2+105, Math.PI, Math.PI + 2);
 		canvasCtx.stroke();
-		canvasCtx.closePath();
 
-		canvasCtx.lineWidth = 1;
+		canvasCtx.beginPath();
+		canvasCtx.strokeStyle = 'rgba(255, 255, 255, 1.0)';
+		canvasCtx.arc(WIDTH/2, HEIGHT/2, dataArray[25]/2+105, (Math.PI+2)+Math.PI - rotation, Math.PI*2 - rotation, true);
+		canvasCtx.lineWidth = 4;
+		canvasCtx.stroke();
+
 		canvasCtx.beginPath();
 		canvasCtx.strokeStyle = 'rgba(0, 255, 100, 1.0)';
-		canvasCtx.arc(WIDTH/2, HEIGHT/2, dataArray[25]/2+250, 0, 0.5 * Math.PI);
+		canvasCtx.arc(WIDTH/2, HEIGHT/2, dataArray[25]/2+250, 0 - rotation, 0.5 * Math.PI - rotation);
+		canvasCtx.lineWidth = 6;
 		canvasCtx.stroke();
-		canvasCtx.closePath();
 
 		canvasCtx.beginPath();
 		canvasCtx.strokeStyle = 'rgba(150, 20, 100, 1.0)';
-		canvasCtx.arc(WIDTH/2, HEIGHT/2, dataArray[25]/2+250, 0.5 * Math.PI, Math.PI + 1);
+		canvasCtx.arc(WIDTH/2, HEIGHT/2, dataArray[25]/2+250, 0.5 * Math.PI - rotation, Math.PI + 1 - rotation);
 		canvasCtx.stroke();
-		canvasCtx.closePath();
+
+		canvasCtx.beginPath();
+		canvasCtx.strokeStyle = 'rgba(20, 20, 185, 1.0)';
+		canvasCtx.arc(WIDTH/2, HEIGHT/2, dataArray[25]/2+250, Math.PI+1 - rotation, 0 - rotation);
+		canvasCtx.stroke();
+		
 	}
 	draw();
 }
@@ -493,10 +554,9 @@ function visualizeWaveform(){
 		var sectionWidth = canvasCtx.canvas.width / bufferLength;
 		var x = 0;
 
-		console.log(dataArray);
 		for(let i=0; i<bufferLength; i++){
 			var v = dataArray[i] / 128.0;
-			var y = v * canvasCtx.canvas.height/2;
+			var y = v * canvasCtx.canvas.height/4;
 
 			if(i == 0) {
 				canvasCtx.moveTo(x, y);
@@ -509,7 +569,6 @@ function visualizeWaveform(){
 		}
 
 		canvasCtx.lineTo(canvasCtx.canvas.width, canvasCtx.canvas.height/2);
-		canvasCtx.closePath();
 		canvasCtx.stroke();
 	}
 	draw();

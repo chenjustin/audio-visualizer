@@ -174,3 +174,6 @@ input:checked + .toggle-switch:before {
 	color: #DEDEDE;
 	font-size: 15px;
 }
+#bars-settings{
+	display: none;
+}

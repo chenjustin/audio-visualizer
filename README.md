@@ -17,6 +17,9 @@ The visualizer should now respond to your PC's sound output. Try watching the vi
 
 If you don't see Stereo Mix listed as a recording device, right click the page and check "Show Disabled Devices".
 
-Here are some screenshots of the "Frequency Bars" visualization
+Screenshots of the "Windmill" visualization
+![Windmill](https://cloud.githubusercontent.com/assets/10242137/26031391/13ded1ae-383f-11e7-9f30-433868d0b31f.png)
+
+Screenshots of the "Frequency Bars" visualization
 ![Blue Sky](https://cloud.githubusercontent.com/assets/10242137/25936966/db389be4-35f7-11e7-9334-4a066d6110c0.png)
 ![Twilight](https://cloud.githubusercontent.com/assets/10242137/25936852/5d0c8e92-35f7-11e7-99c1-83cdf0ae0af4.png)

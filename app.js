@@ -116,7 +116,7 @@ function initVizStyleChooser(){
 		});
 	}
 	//	"Windmill" is the default style when the app starts
-	STYLES[2].click();
+	STYLES[0].click();
 }
 
 //	**************	"Windmill" Style Settings 	**************
@@ -552,7 +552,7 @@ function initFreqBarsStyleSettings(){
 			switch(i){
 				//	Blue Sky
 				case 0:
-					presetSliderSettings = [100, 200, 230, 1.0, 102, 102, 255, 0.5, 85, 100, 250, 1.0, 8, 0.30];
+					presetSliderSettings = [100, 200, 230, 1.0, 102, 102, 255, 0.5, 85, 100, 250, 1.0, 8, 0.40];
 					for(let k=0; k<freq_bars_sliders.length; k++){
 						let presetValue = presetSliderSettings[k];
 						freq_bars_sliders[k].noUiSlider.set(presetValue);
@@ -563,7 +563,7 @@ function initFreqBarsStyleSettings(){
 					break;
 				//	Neon Purple
 				case 1:
-					presetSliderSettings = [255, 74, 243, 1.0, 0, 17, 20, 0.63, 55, 227, 101, 1.0, 8, 0.35];
+					presetSliderSettings = [255, 74, 243, 1.0, 0, 17, 20, 0.63, 55, 227, 101, 1.0, 8, 0.45];
 					for(let k=0; k<freq_bars_sliders.length; k++){
 						let presetValue = presetSliderSettings[k];
 						freq_bars_sliders[k].noUiSlider.set(presetValue);
@@ -574,7 +574,7 @@ function initFreqBarsStyleSettings(){
 					break;
 				//	Twilight
 				case 2:
-					presetSliderSettings = [0, 0, 49, 1.0, 19, 0, 0, 0.85, 51, 8, 206, 0.32, 9, 0.30];
+					presetSliderSettings = [0, 0, 49, 1.0, 19, 0, 0, 0.85, 51, 8, 206, 0.32, 9, 0.40];
 					for(let k=0; k<freq_bars_sliders.length; k++){
 						let presetValue = presetSliderSettings[k];
 						freq_bars_sliders[k].noUiSlider.set(presetValue);
@@ -713,7 +713,7 @@ function visualizeFrequencyBars(){
 		x = 0;
 		for(let i = 0; i < bufferLength; i++){
 			//	RGB needs to take integers, so we need to round 'barHeight'.
-			barHeight = Math.round(window.innerHeight*barHeight_setting*(dataArray[i] / 256)+10);
+			barHeight = Math.round(barHeight_setting * (Math.max(((dataArray[i] * 4) - 250), 0)))+10;
 			canvasCtx.fillStyle = 'rgba(' + ((dataArray[i]*responsiveBarColor_r) + barColor_r) + ','+ ((dataArray[i]*responsiveBarColor_g) + barColor_g) +', '+ ((dataArray[i]*responsiveBarColor_b) + barColor_b) +', '+ barColor_a +')';
 			canvasCtx.fillRect(x,HEIGHT-barHeight/2-HEIGHT/2, barWidth, barHeight);
 			x += barWidth + 1;
@@ -729,44 +729,47 @@ function visualizeWaveform(){
 	document.body.appendChild(canvasElement);
 	canvasCtx = document.getElementById('c').getContext('2d');
 
-	var particles = [];
- 
- 	for(let i=0; i< 100; i++){
- 		particles.push(new Particle());
+	var stars = [];
+
+	//	Create stars
+	for(let i=0; i< 20; i++){
+ 		stars.push(new Star());
  	}
 
-	function Particle(){
+	function Star(){
 		this.active = false;
 	}
 
-	Particle.prototype.makeParticle = function(){
+	Star.prototype.createStar = function(){
 		this.x = WIDTH / 2;
 		this.y = HEIGHT / 2;
-		this.radius = Math.random()*2;
-		this.vx = Math.random() * 10 - 5;
-		this.vy = Math.random() * 10 - 5;
-		this.gravity = .45;
+		this.length = 1;
+		this.vx = (Math.random() * 10 - 5)*5;
+		this.vy = (Math.random() * 10 - 5)*5;
+		this.gravity = 0.0;
 		this.active = true;
 
 		canvasCtx.beginPath();
-			canvasCtx.arc(this.x, this.y, this.radius, 0, 2*Math.PI);
-		canvasCtx.fillStyle = 'rgb(0, 255, 0)';
-		canvasCtx.fill();
+			canvasCtx.moveTo(this.x + (Math.random() * 10)*2, this.y + (Math.random() * 10)*2)
+			canvasCtx.lineTo(this.x+this.vx, this.y + this.vy)
+		canvasCtx.strokeStyle = 'rgb(255,255,255)';
+		canvasCtx.stroke();
 	}
 
-	Particle.prototype.animateParticle = function(){
+	Star.prototype.moveStar = function(){
 		this.active = true;
 		this.x += this.vx;
 		this.y += this.vy;
 		this.vy += this.gravity;
-		this.radius = Math.abs(this.radius + 0.05);
+		this.length = Math.abs(this.length + 0.05);
 
 		canvasCtx.beginPath();
-			canvasCtx.arc(this.x, this.y, this.radius, 0, 2*Math.PI);
-		canvasCtx.fillStyle = 'rgb(0, 255, 0)';
-		canvasCtx.fill();
+			canvasCtx.moveTo(this.x, this.y);
+			canvasCtx.lineTo(this.x+(this.vx*8), this.y + (this.vy*8))
+		canvasCtx.strokeStyle = 'rgb(255,255,255)';
+		canvasCtx.stroke();
 
-		if(this.radius >=  4.0){
+		if(this.x >= WIDTH || this.x <= 0 || this.y >= HEIGHT || this.y <= 0){
 			this.active = false;
 		}
 	}
@@ -782,7 +785,7 @@ function visualizeWaveform(){
 		if(selected === 'Waveform'){
 			requestAnimationFrame(draw);
 		}
-		ANALYSER.fftSize = 128;
+		ANALYSER.fftSize = 256;
 
 		var bufferLength = ANALYSER.frequencyBinCount;
 		var dataArray = new Uint8Array(bufferLength);
@@ -797,12 +800,12 @@ function visualizeWaveform(){
 		canvasCtx.fillStyle = grd;
 		canvasCtx.fillRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
 
-		for(let i=0; i< particles.length; i++){
-			if(particles[i].active === true){
-				particles[i].animateParticle();
+		for(let i=0; i< stars.length; i++){
+			if(stars[i].active === true){
+				stars[i].moveStar(i);
 			}
 			else{
-				particles[i].makeParticle();
+				stars[i].createStar();
 			}
 		}
 	}

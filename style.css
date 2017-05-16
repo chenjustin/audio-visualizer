@@ -8,6 +8,7 @@ body, html{
 }
 canvas{
 	position: absolute;
+	background-color: transparent;
 }
 /*	
 	Slider menu button	
@@ -21,7 +22,7 @@ canvas{
 	padding: 12px 13px 12px 15px;
 	transition: 0.4s;
 	transform: translate(0px, 0px);
-	z-index: 3;
+	z-index: 15;
 }
 #settings-button:hover{
 	background-color: white;
@@ -45,7 +46,7 @@ canvas{
 	transition: 0.4s;
 	background-color: rgba(25, 25, 45, 0.65);
 	transform: translate(-600px, 0px);
-	z-index: 1;
+	z-index: 15;
 	cursor: default;
 	padding: 5px 0px 20px 0px;
 }

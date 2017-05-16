@@ -116,7 +116,7 @@ function initVizStyleChooser(){
 		});
 	}
 	//	"Windmill" is the default style when the app starts
-	STYLES[0].click();
+	STYLES[2].click();
 }
 
 //	**************	"Windmill" Style Settings 	**************
@@ -293,7 +293,7 @@ function visualizeWindmill(){
 			}
 			radius = Math.round(20 + (Math.pow(i, 1.8))) + dataArray[i]*chaos;
 			arcStart = (i/24) + rotation;
-			arcEnd = (i/24) + rotation + Math.pow(dataArray[i*2]/200, 4);
+			arcEnd = (i/24) + rotation + Math.pow(dataArray[i*2]/200, 0.8);
 
 			for(let j=1; j<7; j++){
 				//	First "blade"
@@ -729,11 +729,55 @@ function visualizeWaveform(){
 	document.body.appendChild(canvasElement);
 	canvasCtx = document.getElementById('c').getContext('2d');
 
+	var particles = [];
+ 
+ 	for(let i=0; i< 100; i++){
+ 		particles.push(new Particle());
+ 	}
+
+	function Particle(){
+		this.active = false;
+	}
+
+	Particle.prototype.makeParticle = function(){
+		this.x = WIDTH / 2;
+		this.y = HEIGHT / 2;
+		this.radius = Math.random()*2;
+		this.vx = Math.random() * 10 - 5;
+		this.vy = Math.random() * 10 - 5;
+		this.gravity = .45;
+		this.active = true;
+
+		canvasCtx.beginPath();
+			canvasCtx.arc(this.x, this.y, this.radius, 0, 2*Math.PI);
+		canvasCtx.fillStyle = 'rgb(0, 255, 0)';
+		canvasCtx.fill();
+	}
+
+	Particle.prototype.animateParticle = function(){
+		this.active = true;
+		this.x += this.vx;
+		this.y += this.vy;
+		this.vy += this.gravity;
+		this.radius = Math.abs(this.radius + 0.05);
+
+		canvasCtx.beginPath();
+			canvasCtx.arc(this.x, this.y, this.radius, 0, 2*Math.PI);
+		canvasCtx.fillStyle = 'rgb(0, 255, 0)';
+		canvasCtx.fill();
+
+		if(this.radius >=  4.0){
+			this.active = false;
+		}
+	}
+
 
 	function draw() {
+		showFPS();
+
 		//	Resize the canvas every frame to match the window size
-		canvasCtx.canvas.width = window.innerWidth;
-		canvasCtx.canvas.height = window.innerHeight;
+		canvasCtx.canvas.width = WIDTH = window.innerWidth;
+		canvasCtx.canvas.height = HEIGHT = window.innerHeight;
 		//	Check if this is still the selected visualization style
 		if(selected === 'Waveform'){
 			requestAnimationFrame(draw);
@@ -753,28 +797,14 @@ function visualizeWaveform(){
 		canvasCtx.fillStyle = grd;
 		canvasCtx.fillRect(0, 0, canvasCtx.canvas.width, canvasCtx.canvas.height);
 
-		canvasCtx.lineWidth = 3;
-		canvasCtx.beginPath();
-		canvasCtx.strokeStyle = 'rgb(255, 255, 255)';
-		var sectionWidth = canvasCtx.canvas.width / bufferLength;
-		var x = 0;
-
-		for(let i=0; i<bufferLength; i++){
-			var v = dataArray[i] / 128.0;
-			var y = v * canvasCtx.canvas.height/4;
-
-			if(i == 0) {
-				canvasCtx.moveTo(x, y);
+		for(let i=0; i< particles.length; i++){
+			if(particles[i].active === true){
+				particles[i].animateParticle();
 			}
 			else{
-				canvasCtx.lineTo(x, y);
+				particles[i].makeParticle();
 			}
-
-			x += sectionWidth;
 		}
-
-		canvasCtx.lineTo(canvasCtx.canvas.width, canvasCtx.canvas.height/2);
-		canvasCtx.stroke();
 	}
 	draw();
 }

@@ -110,7 +110,7 @@ function initVizStyleChooser(){
 					visualizeFrequencyBars();
 					break;
 				case 2:
-					visualizeWaveform();
+					
 					break;
 			}
 		});
@@ -123,8 +123,11 @@ function initVizStyleChooser(){
 function initWindmillStyleSettings(){
 	windmill_sliders = document.getElementsByClassName('windmill-slider');
 	windmill_sliders_values = document.getElementsByClassName('windmill-slider-value');
+	windmill_checkboxes = document.getElementsByClassName('toggle-windmill');
+	const WINDMILL_PRESETS = document.getElementsByClassName('windmill-presets');
 
 	function updateSliderDisplayValue(){
+
 		for(let i=0; i<windmill_sliders.length; i++){
 			if(typeof windmill_sliders[i].noUiSlider != 'undefined'){
 				if(i === 3 || i === 7 || i === 8 || i === 12 || i === 13){
@@ -138,6 +141,7 @@ function initWindmillStyleSettings(){
 	}
 
 	function createSliders(){
+
 		for(let i=0; i<windmill_sliders.length;i++){
 			//	Alphas
 			if(i === 3 || i === 7 || i === 12 ){
@@ -190,33 +194,35 @@ function initWindmillStyleSettings(){
 		}
 	}
 
-	windmill_checkboxes = document.getElementsByClassName('toggle-windmill');
+	function initPresets(){
+
+		for(let i=0; i<WINDMILL_PRESETS.length; i++){
+			WINDMILL_PRESETS[i].addEventListener('click', function(){
+				//	Deselect all the presets, then select the one that was clicked
+				for(let j=0; j<WINDMILL_PRESETS.length; j++){
+					WINDMILL_PRESETS[j].className = "windmill-presets generic-menu-item";
+				}
+				WINDMILL_PRESETS[i].className = "windmill-presets generic-menu-item selected";
+				let presetSliderSettings;
+				switch(i){
+					//	Default
+					case 0:
+						presetSliderSettings = [120,120,120,1, 120,120,120,1, 0.2, 120,120,120,1, 0];
+						for(let k=0; k<windmill_sliders.length; k++){
+							let presetValue = presetSliderSettings[k];
+							windmill_sliders[k].noUiSlider.set(presetValue);
+						}
+						windmill_checkboxes[0].checked = true;
+						break;
+				}
+			});
+		}
+	}
 
 	createSliders();
+	
+	initPresets();
 
-	const WINDMILL_PRESETS = document.getElementsByClassName('windmill-presets');
-
-	for(let i=0; i<WINDMILL_PRESETS.length; i++){
-		WINDMILL_PRESETS[i].addEventListener('click', function(){
-			//	Deselect all the presets, then select the one that was clicked
-			for(let j=0; j<WINDMILL_PRESETS.length; j++){
-				WINDMILL_PRESETS[j].className = "windmill-presets generic-menu-item";
-			}
-			WINDMILL_PRESETS[i].className = "windmill-presets generic-menu-item selected";
-			let presetSliderSettings;
-			switch(i){
-				//	Default
-				case 0:
-					presetSliderSettings = [120,120,120,1, 120,120,120,1, 0.2, 120,120,120,1, 0];
-					for(let k=0; k<windmill_sliders.length; k++){
-						let presetValue = presetSliderSettings[k];
-						windmill_sliders[k].noUiSlider.set(presetValue);
-					}
-					windmill_checkboxes[0].checked = true;
-					break;
-			}
-		});
-	}
 	//	Manually default to this preset
 	WINDMILL_PRESETS[0].click();
 }
@@ -443,6 +449,10 @@ function initFreqBarsStyleSettings(){
 	//	All the "Frequency Bars" settings sliders
 	freq_bars_sliders = document.getElementsByClassName('freq-bars-slider');
 	freq_bars_values = document.getElementsByClassName('freq-bars-slider-value');
+	//	Automation Checkboxes
+	freq_bars_checkboxes = document.getElementsByClassName('freq-bars-responsive');
+	const BARS_PRESETS = document.getElementsByClassName('bars-presets');
+
 	//	Callback function in response to a slider's update' events. 
 	//	This function updates the display value on the page to reflect the value of the slider 
 	function updateSliderDisplayValue(){
@@ -529,74 +539,74 @@ function initFreqBarsStyleSettings(){
 			freq_bars_sliders[i].noUiSlider.on('update', updateSliderDisplayValue);
 		}
 	}
+
+	//	**************PRESET STYLE SELECTION**************
+	//	Store all the preset choices into an array so we can programatically add
+	//	event listeners to each.
+	function initPresets(){
+
+		for(let i=0; i<BARS_PRESETS.length; i++){
+			BARS_PRESETS[i].addEventListener('click', function(){
+				//	Deselect all the presets, then select the one that was clicked
+				for(let j=0; j<BARS_PRESETS.length; j++){
+					BARS_PRESETS[j].className = "bars-presets generic-menu-item";
+				}
+				BARS_PRESETS[i].className = "bars-presets generic-menu-item selected";
+				let presetSliderSettings;
+				switch(i){
+					//	Blue Sky
+					case 0:
+						presetSliderSettings = [100, 200, 230, 1.0, 102, 102, 255, 0.5, 85, 100, 250, 1.0, 8, 0.40];
+						for(let k=0; k<freq_bars_sliders.length; k++){
+							let presetValue = presetSliderSettings[k];
+							freq_bars_sliders[k].noUiSlider.set(presetValue);
+						}
+						freq_bars_checkboxes[0].checked = true;
+						freq_bars_checkboxes[1].checked = false;
+						freq_bars_checkboxes[2].checked = false;
+						break;
+					//	Neon Purple
+					case 1:
+						presetSliderSettings = [255, 74, 243, 1.0, 0, 17, 20, 0.63, 55, 227, 101, 1.0, 8, 0.45];
+						for(let k=0; k<freq_bars_sliders.length; k++){
+							let presetValue = presetSliderSettings[k];
+							freq_bars_sliders[k].noUiSlider.set(presetValue);
+						}
+						freq_bars_checkboxes[0].checked = true;
+						freq_bars_checkboxes[1].checked = false;
+						freq_bars_checkboxes[2].checked = false;
+						break;
+					//	Twilight
+					case 2:
+						presetSliderSettings = [0, 0, 49, 1.0, 19, 0, 0, 0.85, 51, 8, 206, 0.32, 9, 0.40];
+						for(let k=0; k<freq_bars_sliders.length; k++){
+							let presetValue = presetSliderSettings[k];
+							freq_bars_sliders[k].noUiSlider.set(presetValue);
+						}
+						freq_bars_checkboxes[0].checked = false;
+						freq_bars_checkboxes[1].checked = true;
+						freq_bars_checkboxes[2].checked = true;
+						break;
+					//	Chill vibes
+					case 3:
+						presetSliderSettings = [238, 90, 20, 0.56, 255, 74, 243, 1.0, 54, 198, 185, 0.68, 9, 0.42];
+						for(let k=0; k<freq_bars_sliders.length; k++){
+							let presetValue = presetSliderSettings[k];
+							freq_bars_sliders[k].noUiSlider.set(presetValue);
+						}
+						freq_bars_checkboxes[0].checked = false;
+						freq_bars_checkboxes[1].checked = true;
+						freq_bars_checkboxes[2].checked = false;
+						break;
+				}
+			});
+		}
+	}
 	
 	createSliders();
 
-	//	Automation Checkboxes
-	freq_bars_checkboxes = document.getElementsByClassName('freq-bars-responsive');
+	initPresets();
 
-	//	**************PRESET STYLE SELECTION**************
-
-	//	Store all the preset choices into an array so we can programatically add
-	//	event listeners to each.
-	const BARS_PRESETS = document.getElementsByClassName('bars-presets');
-
-	for(let i=0; i<BARS_PRESETS.length; i++){
-		BARS_PRESETS[i].addEventListener('click', function(){
-			//	Deselect all the presets, then select the one that was clicked
-			for(let j=0; j<BARS_PRESETS.length; j++){
-				BARS_PRESETS[j].className = "bars-presets generic-menu-item";
-			}
-			BARS_PRESETS[i].className = "bars-presets generic-menu-item selected";
-			let presetSliderSettings;
-			switch(i){
-				//	Blue Sky
-				case 0:
-					presetSliderSettings = [100, 200, 230, 1.0, 102, 102, 255, 0.5, 85, 100, 250, 1.0, 8, 0.40];
-					for(let k=0; k<freq_bars_sliders.length; k++){
-						let presetValue = presetSliderSettings[k];
-						freq_bars_sliders[k].noUiSlider.set(presetValue);
-					}
-					freq_bars_checkboxes[0].checked = true;
-					freq_bars_checkboxes[1].checked = false;
-					freq_bars_checkboxes[2].checked = false;
-					break;
-				//	Neon Purple
-				case 1:
-					presetSliderSettings = [255, 74, 243, 1.0, 0, 17, 20, 0.63, 55, 227, 101, 1.0, 8, 0.45];
-					for(let k=0; k<freq_bars_sliders.length; k++){
-						let presetValue = presetSliderSettings[k];
-						freq_bars_sliders[k].noUiSlider.set(presetValue);
-					}
-					freq_bars_checkboxes[0].checked = true;
-					freq_bars_checkboxes[1].checked = false;
-					freq_bars_checkboxes[2].checked = false;
-					break;
-				//	Twilight
-				case 2:
-					presetSliderSettings = [0, 0, 49, 1.0, 19, 0, 0, 0.85, 51, 8, 206, 0.32, 9, 0.40];
-					for(let k=0; k<freq_bars_sliders.length; k++){
-						let presetValue = presetSliderSettings[k];
-						freq_bars_sliders[k].noUiSlider.set(presetValue);
-					}
-					freq_bars_checkboxes[0].checked = false;
-					freq_bars_checkboxes[1].checked = true;
-					freq_bars_checkboxes[2].checked = true;
-					break;
-				//	Chill vibes
-				case 3:
-					presetSliderSettings = [238, 90, 20, 0.56, 255, 74, 243, 1.0, 54, 198, 185, 0.68, 9, 0.42];
-					for(let k=0; k<freq_bars_sliders.length; k++){
-						let presetValue = presetSliderSettings[k];
-						freq_bars_sliders[k].noUiSlider.set(presetValue);
-					}
-					freq_bars_checkboxes[0].checked = false;
-					freq_bars_checkboxes[1].checked = true;
-					freq_bars_checkboxes[2].checked = false;
-					break;
-			}
-		});
-	}
 	//	Manually default to this preset
 	BARS_PRESETS[0].click();
 }
@@ -722,6 +732,7 @@ function visualizeFrequencyBars(){
 	draw();
 }
 
+/*
 function visualizeWaveform(){
 	//	Create a new Canvas element and insert it into the DOM
 	var canvasElement = document.createElement('canvas')
@@ -811,4 +822,4 @@ function visualizeWaveform(){
 	}
 	draw();
 }
-
+*/

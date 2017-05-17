@@ -178,3 +178,6 @@ input:checked + .toggle-switch:before {
 #bars-settings{
 	display: none;
 }
+.hide{
+	display: none;
+}

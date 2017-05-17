@@ -110,7 +110,7 @@ function initVizStyleChooser(){
 					visualizeFrequencyBars();
 					break;
 				case 2:
-					
+					visualizeNew();
 					break;
 			}
 		});
@@ -207,7 +207,7 @@ function initWindmillStyleSettings(){
 				switch(i){
 					//	Default
 					case 0:
-						presetSliderSettings = [120,120,120,1, 120,120,120,1, 0.2, 120,120,120,1, 0];
+						presetSliderSettings = [120,120,120,1, 120,120,120,1, 0.2, 120,120,120,1, 1.1];
 						for(let k=0; k<windmill_sliders.length; k++){
 							let presetValue = presetSliderSettings[k];
 							windmill_sliders[k].noUiSlider.set(presetValue);
@@ -728,6 +728,8 @@ function visualizeFrequencyBars(){
 			canvasCtx.fillRect(x,HEIGHT-barHeight/2-HEIGHT/2, barWidth, barHeight);
 			x += barWidth + 1;
 		}
+
+		//canvasCtx.rotate(dataArray[25]/180);
 	}
 	draw();
 }
